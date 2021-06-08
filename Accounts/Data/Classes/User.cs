@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Accounts.Data
+namespace Accounts.Data.Classes
 {
     class User : Item, IUser
     {
