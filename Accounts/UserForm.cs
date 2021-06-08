@@ -13,6 +13,7 @@ namespace Accounts
         public UserForm()
         {
             InitializeComponent();
+            ActiveControl = usernameTextBox;
         }
 
         public string Username

@@ -8,7 +8,7 @@ namespace Accounts.UI.Commands
 {
     class AddNode : ICommand
     {
-        public AddNode(TreeNodeCollection nodes, TreeNode node)
+        public AddNode( TreeNodeCollection nodes, TreeNode node )
         {
             Nodes = nodes;
             Node  = node;

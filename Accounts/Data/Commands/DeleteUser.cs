@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Accounts.Data.Commands
 {
-    class RemoveUser : ICommand
+    class DeleteUser : ICommand
     {
-        public RemoveUser( IUser user)
+        public DeleteUser( IUser user )
         {
             User = user;
         }
