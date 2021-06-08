@@ -19,6 +19,6 @@ namespace Accounts.Data.Observables
             get => Organization.Name; 
             set { Organization.Name = value; InvokeNotify(); } 
         }
-        public ICollection<User> Users { get => Organization.Users; set => Organization.Users = value; }
+        public ICollection<IUser> Users { get => Organization.Users; }
     }
 }

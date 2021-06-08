@@ -1,4 +1,5 @@
-﻿using Accounts.Patterns.Factory;
+﻿using Accounts.Data.Classes;
+using Accounts.Patterns.Factory;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Accounts.Data.Classes
 {
-    class Item : IItem
+    internal class Item : IItem
     {
         public bool Zoombie { get; set; } = false;
     }
