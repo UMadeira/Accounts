@@ -1,7 +1,6 @@
 ﻿
-using System;
+using Accounts.Patterns.Observer;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Accounts.Data.Observables
 {
@@ -10,15 +9,20 @@ namespace Accounts.Data.Observables
         public ObservableOrganization(IOrganization organization) : base(organization)
         {
             Organization = organization;
+
+            var users = new ObservableCollection<IUser>( organization.Users );
+            users.Notify += ( sender, args ) => InvokeNotify( args );
+            Users = users;
         }
 
         private IOrganization Organization { get; }
-
+        
         public string Name 
         { 
             get => Organization.Name; 
             set { Organization.Name = value; InvokeNotify(); } 
         }
-        public ICollection<IUser> Users { get => Organization.Users; }
+
+        public ICollection<IUser> Users { get; }
     }
 }
