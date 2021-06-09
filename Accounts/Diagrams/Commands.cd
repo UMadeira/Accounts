@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Accounts.Commands.CommandManager">
+    <Position X="7.5" Y="2" Width="2.5" />
+    <Members>
+      <Method Name="CommandManager" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAgAIAAAABAQgAAAAAAABAAAAAIBAQAAAAAAAAAA=</HashCode>
+      <FileName>Commands\CommandManager.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Commands" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Accounts.Commands.CommandDecorator">
+    <Position X="0.75" Y="2" Width="2.25" />
+    <Members>
+      <Method Name="CommandDecorator" Hidden="true" />
+      <Method Name="ToString" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAABAAEAAAABAABCAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\CommandDecorator.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Command" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Accounts.Commands.MacroCommand">
+    <Position X="4" Y="5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAJAAgAAQAAABAAEAAAAAAABCAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\MacroCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Accounts.Commands.TraceCommandDecorator">
+    <Position X="0.75" Y="5" Width="2.25" />
+    <Members>
+      <Method Name="TraceCommandDecorator" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAABAAAAAAAAAABCAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\TraceCommandDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Accounts.Commands.ICommand">
+    <Position X="4.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAABAAAAAAAAAABCAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\ICommand.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Accounts.Commands.ICommandManager">
+    <Position X="11.25" Y="2" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAABAQAAAAAAAABAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\ICommandManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

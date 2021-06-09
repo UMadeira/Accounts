@@ -28,6 +28,8 @@ namespace Accounts
         {
             InitializeComponent();
 
+            exitToolStripMenuItem.Click += ( sender, args ) => Application.Exit();
+
             undoToolStripButton.Click += OnUndo;
             undoToolStripMenuItem.Click += OnUndo;
 
