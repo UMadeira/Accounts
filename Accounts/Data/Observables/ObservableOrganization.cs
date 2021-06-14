@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Accounts.Data.Observables
 {
-    class ObservableOrganization : ObservableItem, IOrganization
+    class ObservableOrganization : ObservableItem<IOrganization>, IOrganization
     {
         public ObservableOrganization(IOrganization organization) : base(organization)
         {
@@ -16,13 +16,12 @@ namespace Accounts.Data.Observables
         }
 
         private IOrganization Organization { get; }
-        
+        public  ICollection<IUser> Users { get; }
+
         public string Name 
         { 
             get => Organization.Name; 
             set { Organization.Name = value; InvokeNotify(); } 
         }
-
-        public ICollection<IUser> Users { get; }
     }
 }

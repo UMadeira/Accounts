@@ -1,33 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 
 namespace Accounts.Patterns.Factory
 {
     class Factory : IFactory
     {
-        private IList<Type> Types { get; } = new List<Type>();
+        private IList<Type> Constructs { get; } = new List<Type>();
+
+        public IEnumerable<Type> Types => Constructs;
 
         public void Regist(Type type)
         {
-            if (Types.Contains(type)) return;
-            Types.Add( type );
-        }
-
-        public virtual T Create<T>()
-        {
-            foreach ( var type in Types )
-            {
-                if ( ! type.GetInterfaces().Contains( typeof(T) ) ) continue;
-                return Cast<T>(Activator.CreateInstance(type));
-            }
-            return Cast<T>(null);
+            if ( Constructs.Contains(type)) return;
+            Constructs.Add( type );
         }
 
         public virtual T Create<T>( params object?[]? args )
         {
-            foreach (var type in Types)
+            foreach (var type in Constructs )
             {
                 if (!type.GetInterfaces().Contains(typeof(T))) continue;
                 return Cast<T>(Activator.CreateInstance( type, args ) );

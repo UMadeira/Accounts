@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Accounts.Patterns.Repository
 {
-    public interface IRepository<T> where T : class
+    public interface IRepository<TEntity> where TEntity : class
     {
-        IEnumerable<T> All { get; }
+        IQueryable<TEntity> Entities { get; }
 
-        IEnumerable<S> GetOfType<S>() where S : T;
+        void Insert(TEntity entity);
+        void Delete(TEntity entity);
+        void Update(TEntity entity);
 
-        void Add(T entity);
-        void Remove(T entity);
-        void Update(T entity);
+        IRepository<T> GetRepository<T>() where T : class;
     }
 }

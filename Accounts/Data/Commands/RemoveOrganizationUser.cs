@@ -1,7 +1,4 @@
-﻿using Accounts.Commands;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Accounts.Patterns.Commands;
 
 namespace Accounts.Data.Commands
 {

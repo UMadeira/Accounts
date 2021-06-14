@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Accounts.Data.Observables
+﻿namespace Accounts.Data.Observables
 {
-    class ObservableUser : ObservableItem, IUser
+    class ObservableUser : ObservableItem<IUser>, IUser
     {
         public ObservableUser( IUser user ) : base( user )
         {

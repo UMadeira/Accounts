@@ -1,7 +1,4 @@
-﻿using Accounts.Commands;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Accounts.Patterns.Commands;
 using System.Windows.Forms;
 
 namespace Accounts.UI.Commands
@@ -12,10 +9,12 @@ namespace Accounts.UI.Commands
         {
             Nodes = nodes;
             Node  = node;
+            Index = nodes.IndexOf( node );
         }
 
         private TreeNodeCollection Nodes { get; set; }
         private TreeNode Node { get; set; }
+        private int Index { get; set; }
 
         public void Do()
         {
@@ -24,7 +23,7 @@ namespace Accounts.UI.Commands
 
         public void Undo()
         {
-            Nodes.Add(Node);
+            Nodes.Insert( Index, Node );
         }
 
         public void Redo() => Do();

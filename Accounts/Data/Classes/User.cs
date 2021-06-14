@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Accounts.Data.Classes
+﻿namespace Accounts.Data.Classes
 {
     internal class User : Item, IUser
     {

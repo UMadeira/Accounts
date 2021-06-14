@@ -1,4 +1,4 @@
-﻿namespace Accounts.Commands
+﻿namespace Accounts.Patterns.Commands
 {
     interface ICommandManager
     {

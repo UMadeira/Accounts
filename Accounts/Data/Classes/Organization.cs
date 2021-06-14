@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Accounts.Patterns.Mappers;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 
 namespace Accounts.Data.Classes
@@ -11,6 +10,6 @@ namespace Accounts.Data.Classes
 
         public ICollection<User> Users { get; set; } = new List<User>();
         
-        ICollection<IUser> IOrganization.Users { get => new List<IUser>(Users.Cast<IUser>()); }
+        ICollection<IUser> IOrganization.Users => new CollectionMapper<User,IUser>( Users );
     }
 }

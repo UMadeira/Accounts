@@ -1,18 +1,22 @@
 ﻿using Accounts.Patterns.Observer;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Accounts.Data.Observables
 {
     static class ObservableExtensions
     {
-        public static void Subscribe( this IItem self, EventHandler handler )
+        public static void Subscribe<T>( this IItem self, EventHandler handler )
         {
-            var observable = self as IObservable;
+            var observable = self as Patterns.Observer.IObservable;
             if (observable == null) return;
 
             observable.Notify += handler;
+        }
+
+        public static T GetSubject<T>( this IItem self ) where T : class, IItem
+        {
+            var observable = self as ObservableItem<T>;
+            return observable?.Item;
         }
     }
 }

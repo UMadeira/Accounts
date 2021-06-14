@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Accounts.Data.Classes
+﻿namespace Accounts.Data.Classes
 {
     internal class Item : IItem
     {
-        public bool Zoombie { get; set; } = false;
+        public int    Id        { get; set; } = 0;
+        public bool   Zombie    { get; set; } = false;
+        public byte[] TimeStamp { get; set; }
+
+        public IItem Entity => this;
     }
 }

@@ -1,7 +1,4 @@
-﻿using Accounts.Commands;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Accounts.Patterns.Commands;
 
 namespace Accounts.Data.Commands
 {
@@ -16,12 +13,12 @@ namespace Accounts.Data.Commands
 
         public void Do()
         {
-            Organization.Zoombie = false;
+            Organization.Zombie = false;
         }
 
         public void Undo()
         {
-            Organization.Zoombie = true;
+            Organization.Zombie = true;
         }
 
         public void Redo() => Do();

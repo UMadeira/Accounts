@@ -8,7 +8,7 @@ namespace Accounts
 {
     internal partial class OrganizationForm : Form
     {
-        public OrganizationForm(IRepository<IUser> repository)
+        public OrganizationForm( IRepository<IUser> repository )
         {
             InitializeComponent();
             ActiveControl = nameTextBox;
@@ -24,7 +24,7 @@ namespace Accounts
             existingUsersListView.DoubleClick += (sender, args) => AddUser();
             selectedUsersListView.DoubleClick += (sender, args) => RemoveUser();
 
-            foreach ( var user in repository.All )
+            foreach ( var user in repository.Entities )
             {
                 AppendItem( existingUsersListView, user );
             }
@@ -46,7 +46,7 @@ namespace Accounts
             }
             set 
             {
-                foreach ( var user in value.Where( u => u.Zoombie == false) )
+                foreach ( var user in value.Where( u => u.Zombie == false) )
                 {
                     AppendItem( selectedUsersListView, user );
                     RemoveItem( existingUsersListView, user );

@@ -1,4 +1,4 @@
-﻿using Accounts.Commands;
+﻿using Accounts.Patterns.Commands;
 
 namespace Accounts.Data.Commands
 {

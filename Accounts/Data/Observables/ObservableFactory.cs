@@ -1,7 +1,7 @@
 ﻿using Accounts.Patterns.Factory;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Windows.Forms.VisualStyles;
 
 namespace Accounts.Data.Observables
 {
@@ -13,12 +13,23 @@ namespace Accounts.Data.Observables
             Regist(typeof(ObservableOrganization));
         }
 
-        private IFactory BaseFactory { get; } = new DataFactory(); 
+        private IDictionary<object, object> Observables { get; }  = new Dictionary<object, object>();
 
-        public override T Create<T>()
+        public T Create<T>( T subject ) //where T : IItem
         {
-            var item = BaseFactory.Create<T>();
-            return base.Create<T>(item);
+            if ( Observables.ContainsKey( subject ) )
+                return Cast<T>(Observables[subject]);
+
+            var observable = base.Create<T>( subject );
+            Observables.Add( subject, observable );
+
+            return observable;
+        }
+
+        public override T Create<T>( params object?[]? args )
+        {
+            System.Diagnostics.Trace.Assert( args.Length == 1 );
+            return Cast<T>( Create( (T) args[0] ) );
         }
     }
 }

@@ -3,27 +3,37 @@ using System.Linq;
 
 namespace Accounts.Patterns.Repository
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        private IList<T> Entities { get; } = new List<T>();
+        Repository(IUnitOfWork unitOfWork)
+        {
+            UnitOfWork = unitOfWork;
+        }
 
-        public IEnumerable<T> All => Entities;
-        public IEnumerable<S> GetOfType<S>() where S : T => Entities.OfType<S>();
+        private IUnitOfWork    UnitOfWork { get; }
+        private IList<TEntity> Elements   { get; } = new List<TEntity>();
 
-        public void Add( T entity )
+        public IQueryable<TEntity> Entities => Elements.AsQueryable<TEntity>();
+
+        public void Insert( TEntity entity )
         {
             if ( Entities.Contains( entity ) ) return;
-            Entities.Add(entity);
+            Elements.Add(entity);
         }
 
-        public void Remove(T entity)
+        public void Delete(TEntity entity)
         {
             if ( ! Entities.Contains( entity ) ) return;
-            Entities.Remove( entity );
+            Elements.Remove( entity );
         }
 
-        public void Update(T entity)
+        public void Update(TEntity entity)
         {
+        }
+
+        public IRepository<T> GetRepository<T>() where T : class
+        {
+            return UnitOfWork.GetRepository<T>();
         }
     }
 }

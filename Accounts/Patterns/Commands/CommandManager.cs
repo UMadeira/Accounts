@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace Accounts.Commands
+namespace Accounts.Patterns.Commands
 {
     class CommandManager : ICommandManager
     {

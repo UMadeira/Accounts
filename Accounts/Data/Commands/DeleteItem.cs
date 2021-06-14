@@ -2,23 +2,23 @@
 
 namespace Accounts.Data.Commands
 {
-    class CreateUser : ICommand
+    class DeleteItem : ICommand
     {
-        public CreateUser( IUser user)
+        public DeleteItem( IItem item )
         {
-            User = user;
+            Item = item;
         }
 
-        private IUser User { get; set; }
+        private IItem Item { get; set; }
 
         public void Do()
         {
-            User.Zombie = false;
+            Item.Zombie = false;
         }
 
         public void Undo()
         {
-            User.Zombie = true;
+            Item.Zombie = true;
         }
 
         public void Redo() => Do();

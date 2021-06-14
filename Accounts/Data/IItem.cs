@@ -2,6 +2,6 @@
 {
     interface IItem
     {
-        bool Zoombie { get; set; }
+        bool  Zombie { get; set; }
     }
 }

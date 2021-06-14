@@ -1,34 +1,42 @@
-﻿using Accounts.Commands;
-using Accounts.Data;
+﻿using Accounts.Data;
 using Accounts.Data.Commands;
-using Accounts.Patterns.Factory;
-using Accounts.UI.Commands;
 using Accounts.Data.Observables;
+using Accounts.Patterns.Commands;
+using Accounts.Patterns.Factory;
+using Accounts.Patterns.Observer;
+using Accounts.Patterns.Repository;
+using Accounts.UI.Commands;
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Accounts.Patterns.Observer;
-using Accounts.Patterns.Repository;
+using Accounts.UI.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Accounts
 {
     public partial class MainForm : Form
     {
-        private IFactory Factory { get; } = new ObservableFactory();
-        private IRepository<IUser> Repository { get; } = new Repository<IUser>();
+        private IFactory ObservableFactory { get; } = new ObservableFactory();
+        private IUnitOfWork UnitOfWork { get; }
 
-        public MainForm()
+        public MainForm( IUnitOfWork unitOfWork )
         {
+            UnitOfWork = unitOfWork;
+
             InitializeComponent();
 
             exitToolStripMenuItem.Click += ( sender, args ) => Application.Exit();
+
+            editToolStripButton.Click += OnEdit;
+            mainTreeView.AfterSelect +=
+                ( sender, args ) => editToolStripButton.Enabled = mainTreeView.SelectedNode != null;
+
+            deleteToolStripButton.Click += OnDelete;
+            mainTreeView.AfterSelect +=
+                ( sender, args ) => deleteToolStripButton.Enabled = mainTreeView.SelectedNode != null;
 
             undoToolStripButton.Click += OnUndo;
             undoToolStripMenuItem.Click += OnUndo;
@@ -40,9 +48,40 @@ namespace Accounts
             organizationToolStripButton.Click += OnCreateOrganization;
 
             CommandManager.Instance.Notify += ( s, a ) => undoToolStripButton.Enabled = CommandManager.Instance.HasUndo();
-            CommandManager.Instance.Notify += ( s, a ) => undoToolStripMenuItem.Enabled = CommandManager.Instance.HasUndo();
             CommandManager.Instance.Notify += ( s, a ) => redoToolStripButton.Enabled = CommandManager.Instance.HasRedo();
+
+            CommandManager.Instance.Notify += ( s, a ) => undoToolStripMenuItem.Enabled = CommandManager.Instance.HasUndo();
             CommandManager.Instance.Notify += ( s, a ) => redoToolStripMenuItem.Enabled = CommandManager.Instance.HasRedo();
+
+            LoadOrganizations( UnitOfWork.GetRepository<IOrganization>().Entities.Include( o => o.Users) );
+            LoadUsers( UnitOfWork.GetRepository<IUser>().Entities );
+        }
+
+        private void LoadUsers( IQueryable<IUser> users )
+        {
+            foreach ( var user in users )
+            {
+                if ( user.Zombie ) continue;
+                var node = CreateNode( user );
+                mainTreeView.Nodes.Add( node );
+            }
+        }
+
+        private void LoadOrganizations( IQueryable<IOrganization> organizations )
+        {
+            foreach ( var organization in organizations )
+            {
+                if ( organization.Zombie ) continue;
+
+                var node = CreateNode( organization );
+                mainTreeView.Nodes.Add( node );
+
+                foreach ( var user in organization.Users )
+                {
+                    var child = CreateNode( user  );
+                    node.Nodes.Add( child );
+                }
+            }
         }
 
         private void OnUndo(object sender, EventArgs e)
@@ -65,68 +104,78 @@ namespace Accounts
             {
                 var macro = new MacroCommand();
 
-                var user = Factory.Create<IUser>();
+                var user = UnitOfWork.Factory.Create<IUser>();
                 user.Username = dialog.Username;
                 user.Password = dialog.Password;
-                Repository.Add(user);
+
+                try
+                {
+                    UnitOfWork.Begin();
+                    UnitOfWork.GetRepository<IUser>().Insert( user );
+                    UnitOfWork.Commit();
+                }
+                catch ( Exception exception )
+                {
+                    UnitOfWork.Rollback();
+                    MessageBox.Show( exception.Message, "Error", MessageBoxButtons.OK );
+                    return;
+                }
 
                 macro.Add( new CreateUser( user ) );
 
-                var node = new TreeNode( user.Username );
-                node.ImageIndex = node.SelectedImageIndex = 0;
-                node.Tag = user;
+                var node = CreateNode( user );
                 macro.Add( new AddNode( mainTreeView.Nodes, node ) );
 
                 CommandManager.Instance.Execute(macro);
-
-                user.Subscribe( (sender, args) => node.Text = user.Username );
             }
         }
         private void OnCreateOrganization(object sender, EventArgs e)
         {
-            var dialog = new OrganizationForm( Repository );
-            dialog.OrganizationName = "New Organization";
+            var dialog = new OrganizationForm( UnitOfWork.GetRepository<IUser>() ) {
+                OrganizationName = "New Organization"
+            };
+
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 var macro = new MacroCommand();
 
-                var organization = Factory.Create<IOrganization>();
+                var organization = UnitOfWork.Factory.Create<IOrganization>();
                 organization.Name = dialog.OrganizationName;
-
-                foreach (var user in dialog.Users)
+                foreach ( var user in dialog.Users)
                 {
                     organization.Users.Add(user);
                 }
 
+                try
+                {
+                    UnitOfWork.Begin();
+                    UnitOfWork.GetRepository<IOrganization>().Insert( organization );
+                    UnitOfWork.Commit();
+                }
+                catch ( Exception exception )
+                {
+                    UnitOfWork.Rollback();
+                    MessageBox.Show( exception.Message, "Error", MessageBoxButtons.OK );
+                    return;
+                }
+
+                organization = ObservableFactory.Create<IOrganization>( organization );
                 macro.Add( new CreateOrganization( organization ) );
 
-                var node = new TreeNode(organization.Name);
-                node.ImageIndex = node.SelectedImageIndex = 1;
-                node.Tag = organization;
+                var node = CreateNode( organization );
                 macro.Add(new AddNode(mainTreeView.Nodes, node));
 
-                foreach (var user in organization.Users)
+                foreach ( var user in organization.Users)
                 {
-                    var child = new TreeNode( user.Username );
-                    child.ImageIndex = child.SelectedImageIndex = 0;
-                    child.Tag = user;
-
-                    macro.Add(new AddNode(node.Nodes, child));
-
-                    if ( user is IObservable )
-                    {
-                        var observable = user as IObservable;
-                        observable.Notify += (sender, args) => child.Text = user.Username;
-                    }
+                    var child = CreateNode( user );
+                    macro.Add( new AddNode( node.Nodes, child ) );
                 }
 
                 CommandManager.Instance.Execute(macro);
-
-                organization.Subscribe( (sender, args) => node.Text = organization.Name );
             }
         }
 
-        private void OnDoubleClick(object sender, EventArgs e)
+        private void OnEdit(object sender, EventArgs e)
         {
             var item = mainTreeView.SelectedNode?.Tag as IItem;
             if (item == null) return;
@@ -141,11 +190,48 @@ namespace Accounts
             }
         }
 
+        private void OnDelete( object sender, EventArgs e )
+        {
+            var item = mainTreeView.SelectedNode?.Tag as IItem;
+            if ( item == null ) return;
+
+            if ( item is IUser )
+            {
+                Delete( item as IUser );
+            }
+            else if ( item is IOrganization )
+            {
+                Delete( item as IOrganization );
+            }
+        }
+
+        private TreeNode CreateNode( IUser user )
+        {
+            var node = new TreeNode( user.Username );
+            node.ImageIndex = node.SelectedImageIndex = 0;
+
+            user = ObservableFactory.Create<IUser>( user );
+            user.Subscribe<IUser>( ( sender, args ) => node.Text = user.Username );
+            node.Tag = user;
+
+            return node;
+        }
+
+        private TreeNode CreateNode( IOrganization organization )
+        {
+            var node = new TreeNode( organization.Name );
+            node.ImageIndex = node.SelectedImageIndex = 1;
+
+            organization = ObservableFactory.Create<IOrganization>( organization );
+            organization.Subscribe<IOrganization>( ( sender, args ) => node.Text = organization.Name );
+            node.Tag = organization;
+
+            return node;
+        }
+
         private void Edit( IUser user )
         {
-            var dialog = new UserForm();
-            dialog.Username = user.Username;
-            dialog.Password = user.Password;
+            var dialog = new UserForm { Username = user.Username, Password = user.Password };
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
@@ -166,7 +252,7 @@ namespace Accounts
 
         private void Edit( IOrganization organization )
         {
-            var dialog = new OrganizationForm( Repository );
+            var dialog = new OrganizationForm( UnitOfWork.GetRepository<IUser>() );
             dialog.OrganizationName = organization.Name;
             dialog.Users = organization.Users;
 
@@ -210,19 +296,54 @@ namespace Accounts
 
         private void AddChildNode( TreeNode parent, IUser user, MacroCommand macro)
         {
-            var node = new TreeNode(user.Username) { Tag = user };
-            node.ImageIndex = node.SelectedImageIndex = 0;
-            macro.Add(new AddNode(parent.Nodes, node));
-
-            user.Subscribe((sender, args) => node.Text = user.Username);
+            var node = CreateNode( user );
+            macro.Add( new AddNode( parent.Nodes, node ));
         }
 
         private void RemoveChildNode( TreeNode parent, IUser user, MacroCommand macro)
         {
-            var child = parent.Nodes.Cast<TreeNode>().FirstOrDefault( node => node.Tag == user );
+            var child = parent.Nodes.Cast<TreeNode>().FirstOrDefault( node => node.Tag.Equals( user ) );
             if (child == null) return;
 
             macro.Add(new RemoveNode(parent.Nodes, child));
+        }
+
+        private void Delete( IUser user )
+        {
+            var macro = new MacroCommand();
+
+            foreach ( var node in mainTreeView.GetAllNodes() )
+            {
+                if ( node.Tag == null ) continue;
+                if ( ! node.Tag.Equals( user ) ) continue;
+
+                var nodes = node.Parent?.Nodes ?? mainTreeView.Nodes;
+                macro.Add( new RemoveNode( nodes, node ) );
+            }
+
+            macro.Add( new DeleteItem( user ) );
+            UnitOfWork.GetRepository<IUser>().Update( user.GetSubject<IUser>() );
+
+            CommandManager.Instance.Execute( macro );
+        }
+
+        private void Delete( IOrganization organization )
+        {
+            var macro = new MacroCommand();
+
+            foreach ( var node in mainTreeView.GetAllNodes() )
+            {
+                if ( node.Tag == null ) continue;
+                if ( ! node.Tag.Equals( organization ) ) continue;
+
+                var nodes = node.Parent?.Nodes ?? mainTreeView.Nodes;
+                macro.Add( new RemoveNode( nodes, node ) );
+            }
+
+            macro.Add( new DeleteItem( organization ) );
+            UnitOfWork.GetRepository<IOrganization>().Update( organization.GetSubject<IOrganization>() );
+
+            CommandManager.Instance.Execute( macro );
         }
     }
 }

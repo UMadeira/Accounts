@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Accounts.Patterns.Observer
 {
@@ -16,9 +15,10 @@ namespace Accounts.Patterns.Observer
 
         private ICollection<T> Collection { get; }
 
-        public int Count => Collection.Count;
+        public int  Count => Collection.Count;
         public bool IsReadOnly => Collection.IsReadOnly;
         public bool Contains(T item) => Collection.Contains(item);
+
         public IEnumerator<T> GetEnumerator() => Collection.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => Collection.GetEnumerator();
 

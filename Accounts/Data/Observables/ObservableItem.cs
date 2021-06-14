@@ -1,23 +1,42 @@
 ﻿using Accounts.Patterns.Observer;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Accounts.Data.Observables
 {
-    internal class ObservableItem : Observable, IItem, IObservable
+    internal class ObservableItem<T> : Observable, IItem, IObservable where T : class, IItem
     {
-        public ObservableItem(IItem item)
+        public ObservableItem( T item )
         {
             Item = item;
         }
 
-        private IItem Item { get; }
+        public T Item { get; }
 
-        public bool Zoombie 
+        public bool Zombie 
         { 
-            get => Item.Zoombie;
-            set { Item.Zoombie = value; InvokeNotify(); } 
+            get => Item.Zombie;
+            set { Item.Zombie = value; InvokeNotify(); } 
+        }
+
+        public override bool Equals( object obj )
+        {
+            if ( obj is ObservableItem<T> observable ) return Equals( observable );
+            if ( obj is IItem item ) return Equals( item );
+            return Item.Equals( obj );
+        }
+
+        protected bool Equals( IItem other )
+        {
+            return Equals( Item, other );
+        }
+
+        protected bool Equals( ObservableItem<T> other )
+        {
+            return Equals( Item, other.Item );
+        }
+
+        public override int GetHashCode()
+        {
+            return ( Item?.GetHashCode() ?? 0 );
         }
     }
 }

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Accounts.Commands
+namespace Accounts.Patterns.Commands
 {
     class MacroCommand : ICommand
     {
